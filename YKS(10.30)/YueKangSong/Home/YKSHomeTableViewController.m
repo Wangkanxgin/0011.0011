@@ -30,6 +30,8 @@
 #import "YKSDrugCategoryListVC.h"
 #import "YKSDrugListViewController.h"
 #import <UIButton+WebCache.h>
+#import "YKSRotaryPopViewController.h"
+#import "YKSAdvertisementController.h"
 
 @interface YKSHomeTableViewController () <ImagePlayerViewDelegate,UIAlertViewDelegate,UIScrollViewDelegate>
 
@@ -65,7 +67,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    
+    //推出展示广告页面
+    [self presentViewController:[[YKSAdvertisementController alloc] init] animated:NO completion:nil];
     
     self.navigationController.navigationBarHidden = NO;
 
@@ -78,10 +81,7 @@
         }
     }
 
-    
-    
     self.navigationItem.title = @"";
-    
     
     _addressButton.frame = CGRectMake(0, 0, SCREEN_WIDTH - 10, 25);
     
@@ -95,16 +95,12 @@
     
     self.tableView.tableHeaderView = [self tableviewHeaderView];
     
-    
     [self setAddressBtnFrame];
-    
     
     [self requestDrugCategoryList];
     
     [self requestData];
     
-   
-
 }
 
 //请求药品类别列表数据
@@ -118,7 +114,6 @@
         }
         if (ServerSuccess(responseObject)) {
             
-            
             _drugDatas = responseObject[@"data"][@"categorylist"];
             
         } else {
@@ -126,14 +121,12 @@
         }
         
     }];
-
-    
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     
     self.navigationController.navigationBar.hidden=NO;
-    
+    self.tabBarController.tabBar.hidden = NO;
     [self startSingleLocationRequest];
     
     [super viewWillAppear:animated];
@@ -170,23 +163,24 @@
                                               _pageControl.numberOfPages = _imageURLStrings.count;
                                               _pageControl.currentPage = 0;
                                               for (int i = 0; i<_imageURLStrings.count; i++) {
+                                                  //在每一个scrollView的可视范围内添加同等大小按钮
+                                                  UIButton *ImageButton = [UIButton buttonWithType:UIButtonTypeSystem];
+                                                  ImageButton.frame = CGRectMake(SCREEN_WIDTH*i, 0, SCREEN_WIDTH, SCREEN_WIDTH / 320 * kCycleHeight);
+                                                  [ImageButton addTarget:self action:@selector(ImageButton:) forControlEvents:UIControlEventTouchUpInside];
+                                                  ImageButton.tag = i;
+                                                  
                                                   UIImageView *iv = [[UIImageView alloc]initWithFrame:CGRectMake(i*SCREEN_WIDTH, 0, SCREEN_WIDTH, _scrollView.bounds.size.height)];
                                                   [iv sd_setImageWithURL:_imageURLStrings[i][@"imgurl"]placeholderImage:[UIImage imageNamed:@"defatul320"]];
                                                   [_scrollView addSubview:iv];
+                                                  [_scrollView addSubview:ImageButton];
                                               }
                                               
-                                              
-                                              
-                                              //                                              [_imagePlayview reloadData];
                                           } else {
                                               [self showToastMessage:responseObject[@"msg"]];
                                           }
                                       }];
     }
     NSLog(@"will");
-    
-    
-    
 }
 
 
@@ -204,7 +198,6 @@
 
     NSString *address=_addressBtn.titleLabel.text;
     
-    
     CGSize constraintSize = CGSizeMake(320, MAXFLOAT);
     
     // Creates a new font instance with the current font size
@@ -219,7 +212,6 @@
 //定位成功之后再设置地址按钮标题
 -(void)setAddressBtnTitle{
     
-   
     NSDictionary *dic=[UIViewController selectedMyLocation];
     
     NSString *str=dic[@"formatted_address"];
@@ -227,14 +219,10 @@
         
         [self.addressBtn setTitle:[NSString stringWithFormat:@"配送至:%@",str] forState:UIControlStateNormal];
     }
-    
-   
 
     if ([YKSUserModel isLogin]) {
         
         NSDictionary *info = [YKSUserModel shareInstance].currentSelectAddress;
-        
-        
         if (!IS_EMPTY_STRING(info[@"community"]) ) {
             
              NSString *tempString = [NSString stringWithFormat:@"%@", info[@"community"] ? info[@"community"] : @""];
@@ -260,13 +248,8 @@
             else{
                
             }
-
-        
         }
 
-
-      
-        
 //        if (_isShowAddressView) {
 //            [self showAddressView];
 //        }
@@ -313,7 +296,18 @@
 }
 
 
-
+/*点击轮播视图的响应事件    */
+-(void)ImageButton:(UIButton *)button{
+    //推出控制器  显示轮播图活动视图
+    YKSRotaryPopViewController *actionVC = [[YKSRotaryPopViewController alloc]initWithActionTarget:_imageURLStrings[button.tag]];
+    NSLog(@"传过去的数据是:%@",_imageURLStrings[button.tag]);
+    NSDictionary *dic = _imageURLStrings[button.tag];
+    //判断轮播图活动视图是否为空
+    if (!IS_EMPTY_STRING(dic[@"actiontarget"])) {
+        [self.navigationController pushViewController:actionVC animated:YES];
+    }
+    
+}
 #pragma mark - custom
 - (UIView *)tableviewHeaderView {
     

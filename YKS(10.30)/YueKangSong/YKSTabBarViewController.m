@@ -39,10 +39,7 @@
      selectImageName:@"tabbar_my_select"];
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
+
 
 - (void)tabbarItem:(UITabBarItem *)item
          imageName:(NSString *)imageName
