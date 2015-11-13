@@ -25,6 +25,12 @@ UIImagePickerControllerDelegate,
 UINavigationControllerDelegate,
 UIActionSheetDelegate,UIAlertViewDelegate>
 
+//货到付款按钮
+@property(nonatomic,strong)UIButton *daoFuBtn;
+
+//在线支付按钮
+@property(nonatomic,strong)UIButton *onLineBtn;
+
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UILabel *totalPriceLabel;
@@ -270,10 +276,21 @@ UIActionSheetDelegate,UIAlertViewDelegate>
 
 #pragma mark - UITableViewDataSource
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return _isPrescription ? 4 : 3;
+    return _isPrescription ? 5 : 4;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if (_isPrescription) {
+        if (section == 4) {
+            return 3;
+        }
+    }
+    else{
+        if (section==3) {
+            return 3;
+        }
+    }
+
     if (section == 1) {
         return _drugs.count + 1;
     }
@@ -361,66 +378,139 @@ UIActionSheetDelegate,UIAlertViewDelegate>
             }
             return labelCell;
             
-        } else {
+        }        else
+        {
+            YKSBuyCouponCell *couponCell = [tableView dequeueReusableCellWithIdentifier:@"BuyCouponCell" forIndexPath:indexPath];
+            if (_couponInfo) {
+                couponCell.detailTextLabel.text = [NSString stringWithFormat:@"%0.2f优惠劵", [_couponInfo[@"faceprice"] floatValue]];
+            }else{
+                couponCell.detailTextLabel.text = @"";
+            }
+            return couponCell;
+        }
+    }
+    else if(_isPrescription)
+    {
+        
+        if (indexPath.section==3) {
             YKSBuyCouponCell *couponCell = [tableView dequeueReusableCellWithIdentifier:@"BuyCouponCell" forIndexPath:indexPath];
             if (_couponInfo) {
                 couponCell.detailTextLabel.text = [NSString stringWithFormat:@"%0.2f优惠劵", [_couponInfo[@"faceprice"] floatValue]];
             }
             return couponCell;
         }
-    } else  {
-        YKSBuyCouponCell *couponCell = [tableView dequeueReusableCellWithIdentifier:@"BuyCouponCell" forIndexPath:indexPath];
-        if (_couponInfo) {
-            couponCell.detailTextLabel.text = [NSString stringWithFormat:@"%0.2f优惠劵", [_couponInfo[@"faceprice"] floatValue]];
+        else{
+            NSString *iden=@"onetwothree";
+            
+            UITableViewCell *cell=[tableView dequeueReusableCellWithIdentifier:iden];
+            
+            if (!cell) {
+                cell=[[UITableViewCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:iden];
+            }
+            cell.textLabel.text=@"123";
+            return cell;
         }
-        return couponCell;
+        
     }
-}
-
-
-// 后续功能 货到付款 添加在footView里边
-#pragma -mark footerView
--(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
-{
-    
-    if (section == 2)
-    {
+    else {
+        NSString *iden=@"onetwothree";
         
+        UITableViewCell *cell=[tableView dequeueReusableCellWithIdentifier:iden];
         
-        UIView *footView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 50)];
+        if (!cell) {
+            cell=[[UITableViewCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:iden];
+        }
         
-        UIButton *btn1=[UIButton buttonWithType:UIButtonTypeCustom];
-        [btn1 setImage:[UIImage imageNamed:@"thingMoney.png"] forState:UIControlStateNormal];
-        
-        if (SCREEN_WIDTH>320) {
-            btn1.frame =CGRectMake(10, 20,138,42);
+        if (indexPath.row==0) {
+            
+            cell.userInteractionEnabled=NO;
+            UILabel *lable=[[UILabel alloc]initWithFrame:CGRectMake(13, 8, 100, 14)];
+            
+            lable.text=@"支付方式";
+            
+            [cell.contentView addSubview:lable];
+        }
+        else if (indexPath.row==1){
+            
+            cell.shouldIndentWhileEditing=YES;
+            
+            cell.textLabel.text=@"货到付款";
+            
+            _daoFuBtn =[UIButton buttonWithType:UIButtonTypeCustom];
+            
+            [_daoFuBtn setBackgroundImage:[UIImage imageNamed:@"pay"] forState:UIControlStateNormal];
+            [_daoFuBtn setBackgroundImage:[UIImage imageNamed:@"pay_ok"] forState:UIControlStateSelected];
+            _daoFuBtn.frame=CGRectMake(SCREEN_WIDTH-22-25, 15, 17, 17);
+            
+            [cell.contentView addSubview:_daoFuBtn];
             
         }
-        else {
         
-            btn1.frame = CGRectMake(10, 20,92,28);
+        else if (indexPath.row==2){
+            
+            
+            cell.textLabel.text=@"在线支付";
+            
+            _onLineBtn =[UIButton buttonWithType:UIButtonTypeCustom];
+            
+            [_onLineBtn setBackgroundImage:[UIImage imageNamed:@"pay"] forState:UIControlStateNormal];
+            [_onLineBtn setBackgroundImage:[UIImage imageNamed:@"pay_ok"] forState:UIControlStateSelected];
+            _onLineBtn.frame=CGRectMake(SCREEN_WIDTH-22-25,15, 17, 17);
+            
+            [cell.contentView addSubview:_onLineBtn];
         }
         
-       // [btn1 setBackgroundColor:[UIColor redColor]];
-      //  [btn1 setTitle:@"货到付款" forState:UIControlStateNormal];
         
-        // [btn1 addTarget:self action:@"dobtn1:" forControlEvents:UIControlEventTouchUpInside];
-   
-        [footView addSubview:btn1];
-        return footView;
+        
+        return cell;
     }
-    return nil;
-}
--(CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
-{
-    
-    if (section == 2)
-    {
-        return 80;
-    }
-    return 20;
 }
 
+
+
+//// 后续功能 货到付款 添加在footView里边
+//#pragma -mark footerView
+//-(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
+//{
+//    
+//    if (section == 2)
+//    {
+//        
+//        
+//        UIView *footView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 50)];
+//        
+//        UIButton *btn1=[UIButton buttonWithType:UIButtonTypeCustom];
+//        [btn1 setImage:[UIImage imageNamed:@"thingMoney.png"] forState:UIControlStateNormal];
+//        
+//        if (SCREEN_WIDTH>320) {
+//            btn1.frame =CGRectMake(10, 20,138,42);
+//            
+//        }
+//        else {
+//        
+//            btn1.frame = CGRectMake(10, 20,92,28);
+//        }
+//        
+//       // [btn1 setBackgroundColor:[UIColor redColor]];
+//      //  [btn1 setTitle:@"货到付款" forState:UIControlStateNormal];
+//        
+//        // [btn1 addTarget:self action:@"dobtn1:" forControlEvents:UIControlEventTouchUpInside];
+//   
+//        [footView addSubview:btn1];
+//        return footView;
+//    }
+//    return nil;
+//}
+//-(CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+//{
+//    
+//    if (section == 2)
+//    {
+//        return 80;
+//    }
+//    return 20;
+//}
+//
 
 
 
