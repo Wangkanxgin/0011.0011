@@ -36,6 +36,7 @@
         [[NSRunLoop currentRunLoop] addTimer:self.timer1 forMode:NSDefaultRunLoopMode];
     }
     
+    
 }
 - (void)displayRecommendation
 {

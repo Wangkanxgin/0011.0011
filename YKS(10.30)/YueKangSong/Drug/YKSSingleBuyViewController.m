@@ -508,18 +508,26 @@ UIActionSheetDelegate,UIAlertViewDelegate>
 }
 
 - (void)minusCount:(UIButton *)sender {
-    
-    _couponInfo=nil;//(用来放置优惠券的不合理使用)
+    //_couponInfo = nil;
     CGPoint point = [sender convertPoint:CGPointZero toView:self.tableView];
     NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:point];
     YKSBuyDrugCell *drugCell = (YKSBuyDrugCell *)[self.tableView cellForRowAtIndexPath:indexPath];
     _buyCount--;
-    if (_buyCount == 0) {
+    
+    if(_buyCount == 0)
+    {
+        _buyCount = 1;
+        return ;
+    }
+    if (_buyCount  < 1)
+    {
         _buyCount = 1;
     }
     _originTotalPrice = [_drugInfo[@"gprice"] floatValue] *_buyCount;
+    
     if (_originTotalPrice<[self.couponInfo[@"faceprice"] floatValue]) {
         self.couponInfo = nil;
+
 #pragma kkkk
 //        YKSBuyCouponCell *couponCell = [self.tableView dequeueReusableCellWithIdentifier:@"BuyCouponCell" forIndexPath:[NSIndexPath indexPathForRow:0 inSection:2]];
 //        couponCell.detailTextLabel.text = @"";

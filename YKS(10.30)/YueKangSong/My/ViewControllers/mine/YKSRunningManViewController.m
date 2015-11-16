@@ -49,8 +49,8 @@
 }
 -(void)loadData{
     
-    
     if ([YKSUserModel isLogin]) {
+        
         NSString *telePhone=[YKSUserModel shareInstance].telePhone;
 
         NSString *identifierForVendor = [[UIDevice currentDevice].identifierForVendor UUIDString];

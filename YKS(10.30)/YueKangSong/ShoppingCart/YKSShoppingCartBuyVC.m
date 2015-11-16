@@ -118,7 +118,6 @@ UIActionSheetDelegate,UIAlertViewDelegate>
 #warning 可以在这里暂时禁止处方药上传说明
 - (IBAction)buyAction:(id)sender {
     
-    
     if (!_addressInfos) {
         [self showToastMessage:@"请选择收货地址"];
 
@@ -136,8 +135,6 @@ UIActionSheetDelegate,UIAlertViewDelegate>
         [alertView show];
         return;
     }
-    
-
     
     if (_isPrescription && _uploadImages.count == 0) {
         [self showToastMessage:@"处方药请上传医嘱说明"];
@@ -161,11 +158,8 @@ UIActionSheetDelegate,UIAlertViewDelegate>
         
             return;
         }
-        
-           
+    
 }
-
-
 
 - (void)submitOrders {
     [self showProgress];
@@ -203,9 +197,8 @@ UIActionSheetDelegate,UIAlertViewDelegate>
 //                                  [GZBaseRequest deleteShoppingCartBygids:[gids componentsJoinedByString:@","]
 //                                                                 callback:^(id responseObject, NSError *error) {
 //                                                                 }];
-                                 
-                                  
- if (ServerSuccess(responseObject))
+
+if (ServerSuccess(responseObject))
  {
     NSArray *gids = [gcontrast valueForKeyPath:@"gid"];
     //购物车清空
@@ -218,13 +211,12 @@ UIActionSheetDelegate,UIAlertViewDelegate>
         self.tabBarController.selectedIndex = 0;
         [self.navigationController popToRootViewControllerAnimated:NO];
     }];
-    }
+}
  
- else {
+ else  {
+              [self showToastMessage:responseObject[@"msg"]];
         
-            [self showToastMessage:responseObject[@"msg"]];
-        
-            }
+       }
     }];
 }
 
@@ -307,8 +299,6 @@ UIActionSheetDelegate,UIAlertViewDelegate>
             if ([[YKSUserModel shareInstance].currentSelectAddress[@"sendable"] integerValue] == 1) {
                 addressCell.accessoryType = UITableViewCellAccessoryNone;
             }
-            
-            
         }
         if (!dic) {
             addressCell.nameLabel.text = @"点击进入选择收货地址";
@@ -330,7 +320,8 @@ UIActionSheetDelegate,UIAlertViewDelegate>
             drugCell.priceLabel.attributedText = [YKSTools priceString:[drugInfo[@"gprice"] floatValue]];
             drugCell.countLabel.text = [[NSString alloc] initWithFormat:@"x%@", drugInfo[@"gcount"]];
             return drugCell;
-        } else {
+        }
+        else {
             YKSShoppingBuyTotalInfoCell *totalInfoCell = [tableView dequeueReusableCellWithIdentifier:@"totalInfoCell" forIndexPath:indexPath];
             totalInfoCell.countLabel.text = [[NSString alloc] initWithFormat:@"共%@件商品", @(_totalCount)];
             totalInfoCell.freightLabel.text = _freightLabel.text;
@@ -378,7 +369,8 @@ UIActionSheetDelegate,UIAlertViewDelegate>
             }
             return labelCell;
             
-        }        else
+        }
+        else
         {
             YKSBuyCouponCell *couponCell = [tableView dequeueReusableCellWithIdentifier:@"BuyCouponCell" forIndexPath:indexPath];
             if (_couponInfo) {
@@ -391,7 +383,6 @@ UIActionSheetDelegate,UIAlertViewDelegate>
     }
     else if(_isPrescription)
     {
-        
         if (indexPath.section==3) {
             YKSBuyCouponCell *couponCell = [tableView dequeueReusableCellWithIdentifier:@"BuyCouponCell" forIndexPath:indexPath];
             if (_couponInfo) {
@@ -449,7 +440,7 @@ UIActionSheetDelegate,UIAlertViewDelegate>
         else if (indexPath.row==2){
             
             
-            cell.textLabel.text=@"在线支付";
+            cell.textLabel.text=@"微信支付";
             
             _onLineBtn =[UIButton buttonWithType:UIButtonTypeCustom];
             
